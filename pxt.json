@@ -32,8 +32,5 @@
     "supportedTargets": [
         "microbit"
     ],
-    "preferredEditor": "blocksprj",
-    "_comment_jwc_archived": [
-        "23-1006-1820-RQ100-QuestCustomBlocks-Wukong-Oled (v0.36.6, 26-0206-1700)": "github:jasonc1025-333/23-1006-1820-rq100-questcustomblocks-wukong-oled#v0.36.6"
-    ]
+    "preferredEditor": "blocksprj"
 }
