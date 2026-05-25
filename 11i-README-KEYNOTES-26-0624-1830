@@ -1,0 +1,182 @@
+
+// 11i-README-KEYNOTES-26-0624-1830
+// Key Solutions — Quest RnD GitHub + MakeCode Workflow
+// Date: 26-0524
+
+
+// ============================================================
+// SOLUTION 1: Fix MakeCode Extension Not Loading
+// ============================================================
+// Problem:
+//   Adding a GitHub repo as a MakeCode extension fails silently or errors out.
+//
+// Root Causes (confirmed vs unconfirmed):
+//   A) [CONFIRMED] Wrong GitHub URL — repo was imported to a new account/org
+//      (quest-and-vcs-rnd) but README and references still pointed to old URL.
+//      → Must use the new repo URL when adding extension in MakeCode.
+//
+//   B) [LIKELY HELPFUL] Missing "extension": true in pxt.json
+//      → Recommended to add so MakeCode clearly recognizes it as an extension library.
+//
+//   C) [UNCONFIRMED — may NOT be required] pxt.json "name" field with spaces/parens
+//      → NOTE: The bot controller pxt.json has spaces in "name" and works fine.
+//      → The old extension also had spaces in "name" and worked fine as an extension.
+//      → Cleaning the name is good practice but may not be the actual cause of failure.
+//
+// Changes made to extension pxt.json (26-0524):
+//   - "name" cleaned up: removed spaces/parens  (cosmetic, may not be required)
+//   - Added "extension": true                   (recommended)
+//   - Added "description"                       (cosmetic)
+//
+// Also updated README.md extension URL to point to the correct new GitHub repo.
+//
+// Rule: When a repo moves to a new GitHub account/org, update all references to its URL.
+
+
+// ============================================================
+// SOLUTION 2: Load a Specific Old Version in MakeCode
+// ============================================================
+// Problem:
+//   Pasting  https://github.com/org/repo#v0.6.3  in MakeCode Import URL gives:
+//   "No such repository or branch" error.
+//   Error in console: GET .../git/commits/undefined 404
+//
+// Root Cause:
+//   MakeCode cannot resolve annotated git tags to a commit SHA.
+//   It only handles branches reliably, not tags.
+//
+// Fix — Create a branch from the tag on GitHub.com (no git commands needed):
+//   Step 1: Go to repo on GitHub → Tags → click the tag you want (e.g. v0.6.3)
+//   Step 2: Click the branch pill (🏷 v0.6.3 ▾) near top-left of file list
+//   Step 3: Switch to "Branches" tab in the dropdown
+//   Step 4: Type new branch name, e.g.:  stable-v0-6-3
+//   Step 5: Click "Create branch: stable-v0-6-3 from tag 'v0.6.3'"
+//
+// Then in MakeCode Import URL paste:
+//   https://github.com/org/repo#stable-v0-6-3
+//
+// Rule: Always use a branch (not a tag) in MakeCode URLs. Tags don't work.
+
+
+// ============================================================
+// SOLUTION 3: Make an Old Tag the New Default Branch
+// ============================================================
+// Problem:
+//   Newer commits broke the project. Want to revert master to a known good tag.
+//
+// Fix (GUI only, no git commands):
+//   Step 1: Create branch from old tag (see Solution 2 above)
+//           e.g. create branch  main--stable-v0-6-3  from tag  v0.6.3
+//   Step 2: Rename old master for safety:
+//           Code tab → branch dropdown → "View all branches"
+//           → pencil icon next to master → rename to  master-BAD-26-0524-1750
+//   Step 3: Set new default branch:
+//           Settings → General → Default branch → switch to  main--stable-v0-6-3
+//
+// Result:
+//   MakeCode loads the good version by default (no #branch needed in URL).
+//   Old bad commits preserved in  master-BAD-...  branch for reference.
+
+
+// ============================================================
+// SOLUTION 4: Fix Local Repo After Remote Default Branch Changed
+// ============================================================
+// Problem:
+//   VSCode sync fails after changing default branch on GitHub:
+//   "fatal: couldn't find remote ref master"
+//   "[warning] No such branch: master"
+//
+// Root Cause:
+//   Local repo is still tracking origin/master which no longer exists (or was renamed).
+//
+// Fix (one command):
+//   git fetch origin
+//   git checkout main--stable-v0-6-3
+//
+//   → Git auto-sets up tracking: "branch set up to track origin/main--stable-v0-6-3"
+//   → VSCode sync now works correctly against the new default branch.
+
+
+// ============================================================
+// SOLUTION 5: MakeCode Loads Stale/Wrong Project When Signed In
+// ============================================================
+// Problem:
+//   After importing a GitHub URL in MakeCode (signed in), MakeCode shows:
+//   - TypeScript errors for names that exist in source files
+//   - Wrong pxt.json content (e.g. old dependency URLs auto-modified by MakeCode)
+//   - Hard browser reset (Ctrl+Shift+R) does NOT fix it
+//   - Loading same URL in incognito (not signed in) works correctly ← KEY DIAGNOSTIC
+//
+// Root Cause:
+//   MakeCode (signed in) saves a copy of every imported project to the user's
+//   cloud account on MakeCode's servers. On re-import of the same URL, it loads
+//   the CACHED cloud copy instead of fetching fresh from GitHub.
+//   Confirmed by this line in the browser console log:
+//     GET /api/user/project/411b26ed-c75e-4e9d-92f8-ba80fe475332  ← cloud copy, not GitHub
+//
+//   Hard browser reset only clears LOCAL browser cache — it does NOT clear
+//   MakeCode's server-side project cache tied to the user account.
+//
+// Fix — Delete the stale cached project from MakeCode's home screen:
+//   Step 1: Go to https://makecode.microbit.org/ (signed in)
+//   Step 2: On the home screen, find the project in "My Projects"
+//   Step 3: Click the three dots (⋯) on the project card → Delete
+//   Step 4: Do a fresh Import → Import URL with the GitHub URL
+//
+// Result: MakeCode fetches clean from GitHub, no stale cache interference.
+//
+// Rule: If MakeCode behaves differently signed-in vs incognito → delete the
+//       cached project from My Projects and re-import fresh.
+
+
+// ============================================================
+// SOLUTION 6: Duplicate Extension After MakeCode "Pull Changes"
+// ============================================================
+// Problem:
+//   After updating pxt.json on GitHub (e.g. changing extension dependency URL)
+//   and doing "Pull changes" in MakeCode, BOTH the old and new extension appear:
+//   - Left panel shows both extensions, each with red error badges (100+ errors)
+//   - Errors are all "Duplicate identifier" — same namespaces loaded twice
+//   - pxt.json in MakeCode editor shows both old and new dependency lines
+//   - Trash icon on old extension is disabled / greyed out — cannot delete
+//   - Editing pxt.json directly in MakeCode editor to remove old line doesn't work
+//     (MakeCode re-adds it stubbornly from its cached state)
+//
+// Root Cause:
+//   MakeCode "Pull changes" MERGES GitHub's updated pxt.json with its own
+//   cached project state (which still has the old extension). Both entries
+//   end up in pxt.json and both extensions are loaded → duplicate identifiers.
+//
+// Fix — "Revert all" in MakeCode's GitHub sync dialog:
+//   Step 1: Click the branch indicator button at the bottom of MakeCode screen
+//           (shows "#main--stable-v0-6-3 ↑" or similar)
+//   Step 2: In the dialog that opens, click "Revert all changes"
+//   Step 3: MakeCode discards its merged/cached state and restores from GitHub
+//   Result: Clean single-entry pxt.json, no duplicate extension, no errors
+//
+// Alternative Fix (if Revert all not available):
+//   Delete project from My Projects → fresh Import URL (see Solution 5)
+//   Use:  https://github.com/org/repo#branch-name
+//
+// Rule: After updating pxt.json on GitHub, always use "Revert all" in MakeCode
+//       rather than "Pull changes" to avoid merge residue.
+//
+// Note: pxt.json dependency key (left side) is just a label — safe to rename.
+//       pxt.json dependency value (right side) is the actual GitHub URL — this matters.
+
+
+// ============================================================
+// REPO REFERENCE (26-0524)
+// ============================================================
+//
+// Bot Controller Project:
+//   GitHub: https://github.com/quest-and-vcs-rnd/26-0113-0021-rq100_200-bot_controller-onecode-beginner-final--From_24-0214-0310-2.23.0--26-0524-1500
+//   Default branch: main--stable-v0-6-3  (v0.6.3, good version)
+//   Bad old branch: master-BAD-26-0524-1750
+//   MakeCode Import URL (loads default branch):
+//     https://github.com/quest-and-vcs-rnd/26-0113-0021-rq100_200-bot_controller-onecode-beginner-final--From_24-0214-0310-2.23.0--26-0524-1500
+//
+// Quest Custom Blocks Extension:
+//   GitHub: https://github.com/quest-and-vcs-rnd/23-1006-1820-rq100-questcustomblocks-wukong-oled--26-0524-1420
+//   Add to MakeCode via Gear ⚙ → Extensions, paste:
+//     https://github.com/quest-and-vcs-rnd/23-1006-1820-rq100-questcustomblocks-wukong-oled--26-0524-1420
