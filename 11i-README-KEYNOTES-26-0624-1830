@@ -4,6 +4,27 @@
 // Date: 26-0524
 
 
+
+
+// ============================================================
+// REPO REFERENCE (26-0524)
+// ============================================================
+//
+// Bot Controller Project:
+//   GitHub: https://github.com/quest-and-vcs-rnd/26-0113-0021-rq100_200-bot_controller-onecode-beginner-final--From_24-0214-0310-2.23.0--26-0524-1500
+//   Default branch: main--stable-v0-6-3  (v0.6.3, good version)
+//   Bad old branch: master-BAD-26-0524-1750
+//   MakeCode Import URL (loads default branch):
+//     https://github.com/quest-and-vcs-rnd/26-0113-0021-rq100_200-bot_controller-onecode-beginner-final--From_24-0214-0310-2.23.0--26-0524-1500
+//
+// Quest Custom Blocks Extension:
+//   GitHub: https://github.com/quest-and-vcs-rnd/23-1006-1820-rq100-questcustomblocks-wukong-oled--26-0524-1420
+//   Add to MakeCode via Gear ⚙ → Extensions, paste:
+//     https://github.com/quest-and-vcs-rnd/23-1006-1820-rq100-questcustomblocks-wukong-oled--26-0524-1420
+
+
+
+
 // ============================================================
 // SOLUTION 1: Fix MakeCode Extension Not Loading
 // ============================================================
@@ -165,18 +186,3 @@
 //       pxt.json dependency value (right side) is the actual GitHub URL — this matters.
 
 
-// ============================================================
-// REPO REFERENCE (26-0524)
-// ============================================================
-//
-// Bot Controller Project:
-//   GitHub: https://github.com/quest-and-vcs-rnd/26-0113-0021-rq100_200-bot_controller-onecode-beginner-final--From_24-0214-0310-2.23.0--26-0524-1500
-//   Default branch: main--stable-v0-6-3  (v0.6.3, good version)
-//   Bad old branch: master-BAD-26-0524-1750
-//   MakeCode Import URL (loads default branch):
-//     https://github.com/quest-and-vcs-rnd/26-0113-0021-rq100_200-bot_controller-onecode-beginner-final--From_24-0214-0310-2.23.0--26-0524-1500
-//
-// Quest Custom Blocks Extension:
-//   GitHub: https://github.com/quest-and-vcs-rnd/23-1006-1820-rq100-questcustomblocks-wukong-oled--26-0524-1420
-//   Add to MakeCode via Gear ⚙ → Extensions, paste:
-//     https://github.com/quest-and-vcs-rnd/23-1006-1820-rq100-questcustomblocks-wukong-oled--26-0524-1420
